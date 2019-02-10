@@ -16,10 +16,6 @@ public class Meal {
     public Meal() {
     }
 
-    /*public Meal(LocalDateTime dateTime, String description, int calories) {
-        this(UUID.randomUUID().toString(), dateTime, description, calories);
-    }*/
-
     public Meal(int id, LocalDateTime dateTime, String description, int calories) {
         this.id = id;
         this.dateTime = dateTime;
