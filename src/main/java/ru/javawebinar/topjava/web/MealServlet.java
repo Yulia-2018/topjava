@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -32,7 +33,6 @@ public class MealServlet extends HttpServlet {
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
         storage = new ListStorage();
-        storage.clear();
         storage.save(MealsTestData.MEAL_1);
         storage.save(MealsTestData.MEAL_2);
         storage.save(MealsTestData.MEAL_3);
@@ -68,7 +68,7 @@ public class MealServlet extends HttpServlet {
         String id = request.getParameter("id");
         String action = request.getParameter("action");
         if (action == null) {
-            final List<MealTo> mealsWithExcess = MealsUtil.getFilteredWithExcess(storage.getAll(), null, null, 2000);
+            final List<MealTo> mealsWithExcess = MealsUtil.getFilteredWithExcess(storage.getAll(), LocalTime.MIN, LocalTime.MAX, 2000);
             request.setAttribute("meals", mealsWithExcess);
             request.getRequestDispatcher("meals.jsp").forward(request, response);
             return;

@@ -11,11 +11,6 @@ public class ListStorage extends AbstractStorage<Integer> {
     protected List<Meal> storage = new CopyOnWriteArrayList<>(new ArrayList<>());
 
     @Override
-    public void clear() {
-        storage.clear();
-    }
-
-    @Override
     protected void doUpdate(Integer index, Meal meal) {
         storage.set(index, meal);
     }
@@ -33,11 +28,6 @@ public class ListStorage extends AbstractStorage<Integer> {
     @Override
     protected void doDelete(Integer index) {
         storage.remove(index.intValue());
-    }
-
-    @Override
-    public int size() {
-        return storage.size();
     }
 
     @Override
