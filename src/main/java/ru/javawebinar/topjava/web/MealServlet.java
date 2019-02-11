@@ -4,8 +4,8 @@ import org.slf4j.Logger;
 import ru.javawebinar.topjava.MealsTestData;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.model.MealTo;
-import ru.javawebinar.topjava.storage.ListStorage;
-import ru.javawebinar.topjava.storage.Storage;
+import ru.javawebinar.topjava.storage.MapMealStorage;
+import ru.javawebinar.topjava.storage.MealStorage;
 import ru.javawebinar.topjava.util.CounterUtil;
 import ru.javawebinar.topjava.util.MealsUtil;
 
@@ -25,20 +25,20 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class MealServlet extends HttpServlet {
     private static final Logger log = getLogger(MealServlet.class);
 
-    private static Storage storage;
+    private static MealStorage storage;
 
     public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
-        storage = new ListStorage();
-        storage.save(MealsTestData.MEAL_1);
-        storage.save(MealsTestData.MEAL_2);
-        storage.save(MealsTestData.MEAL_3);
-        storage.save(MealsTestData.MEAL_4);
-        storage.save(MealsTestData.MEAL_5);
-        storage.save(MealsTestData.MEAL_6);
+        storage = new MapMealStorage();
+        storage.create(MealsTestData.MEAL_1);
+        storage.create(MealsTestData.MEAL_2);
+        storage.create(MealsTestData.MEAL_3);
+        storage.create(MealsTestData.MEAL_4);
+        storage.create(MealsTestData.MEAL_5);
+        storage.create(MealsTestData.MEAL_6);
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -50,7 +50,7 @@ public class MealServlet extends HttpServlet {
         Meal meal;
         if (Integer.parseInt(id) == 0) {
             meal = new Meal(CounterUtil.incrementAndGet(), LocalDateTime.parse(dateTime), description, Integer.parseInt(calories));
-            storage.save(meal);
+            storage.create(meal);
         } else {
             meal = storage.get(Integer.parseInt(id));
             meal.setDateTime(LocalDateTime.parse(dateTime));
