@@ -6,6 +6,7 @@
     <title>Meals</title>
 </head>
 <body>
+<h3><a href="index.html">Home</a></h3>
 <section>
     <table border="1" cellpadding="8" cellspacing="0">
         <tr>

@@ -6,7 +6,6 @@ import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.model.MealTo;
 import ru.javawebinar.topjava.storage.MapMealStorage;
 import ru.javawebinar.topjava.storage.MealStorage;
-import ru.javawebinar.topjava.util.CounterUtil;
 import ru.javawebinar.topjava.util.MealsUtil;
 
 import javax.servlet.ServletConfig;
@@ -49,7 +48,7 @@ public class MealServlet extends HttpServlet {
         String calories = request.getParameter("calories");
         Meal meal;
         if (Integer.parseInt(id) == 0) {
-            meal = new Meal(CounterUtil.incrementAndGet(), LocalDateTime.parse(dateTime), description, Integer.parseInt(calories));
+            meal = new Meal(storage.incrementAndGetCounter(), LocalDateTime.parse(dateTime), description, Integer.parseInt(calories));
             storage.create(meal);
         } else {
             meal = storage.get(Integer.parseInt(id));

@@ -12,6 +12,11 @@ public class MapMealStorage implements MealStorage {
     protected Map<Integer, Meal> storage = new ConcurrentHashMap<>();
 
     @Override
+    public int incrementAndGetCounter() {
+        return counter.incrementAndGet();
+    }
+
+    @Override
     public Meal update(Meal meal) {
         final int id = meal.getId();
         return storage.replace(id, meal);
