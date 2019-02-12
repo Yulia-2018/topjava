@@ -6,8 +6,6 @@ import java.util.List;
 
 public interface MealStorage {
 
-    int incrementAndGetCounter();
-
     Meal update(Meal meal);
 
     Meal create(Meal meal);

@@ -10,14 +10,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class MapMealStorage implements MealStorage {
 
-    private final AtomicInteger counter = new AtomicInteger(6);
+    private final AtomicInteger counter = new AtomicInteger(0);
 
     private Map<Integer, Meal> storage = new ConcurrentHashMap<>();
-
-    @Override
-    public int incrementAndGetCounter() {
-        return counter.incrementAndGet();
-    }
 
     @Override
     public Meal update(Meal meal) {
@@ -30,7 +25,8 @@ public class MapMealStorage implements MealStorage {
 
     @Override
     public Meal create(Meal meal) {
-        final int id = meal.getId();
+        final int id = counter.incrementAndGet();
+        meal.setId(id);
         storage.put(id, meal);
         return meal;
     }
