@@ -84,11 +84,11 @@ public class MealServlet extends HttpServlet {
                 } else {
                     meal = storage.get(Integer.parseInt(id));
                 }
+                request.setAttribute("meal", meal);
+                request.getRequestDispatcher("editmeal.jsp").forward(request, response);
                 break;
             default:
-                throw new IllegalArgumentException("Action " + action + " is illegal");
+                response.sendRedirect("meals");
         }
-        request.setAttribute("meal", meal);
-        request.getRequestDispatcher("editmeal.jsp").forward(request, response);
     }
 }

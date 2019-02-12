@@ -6,10 +6,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class MapMealStorage implements MealStorage {
 
-    protected Map<Integer, Meal> storage = new ConcurrentHashMap<>();
+    private final AtomicInteger counter = new AtomicInteger(6);
+
+    private Map<Integer, Meal> storage = new ConcurrentHashMap<>();
 
     @Override
     public int incrementAndGetCounter() {
@@ -19,13 +22,17 @@ public class MapMealStorage implements MealStorage {
     @Override
     public Meal update(Meal meal) {
         final int id = meal.getId();
-        return storage.replace(id, meal);
+        if (storage.replace(id, meal) == null) {
+            return null;
+        }
+        return meal;
     }
 
     @Override
     public Meal create(Meal meal) {
         final int id = meal.getId();
-        return storage.put(id, meal);
+        storage.put(id, meal);
+        return meal;
     }
 
     @Override
