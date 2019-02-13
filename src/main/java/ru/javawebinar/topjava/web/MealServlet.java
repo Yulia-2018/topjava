@@ -60,7 +60,6 @@ public class MealServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         log.debug("forward, meals");
 
-        String id = request.getParameter("id");
         String action = request.getParameter("action");
         if (action == null) {
             final List<MealTo> mealsWithExcess = MealsUtil.getFilteredWithExcess(storage.getAll(), LocalTime.MIN, LocalTime.MAX, 2000);
@@ -69,6 +68,7 @@ public class MealServlet extends HttpServlet {
             return;
         }
         Meal meal;
+        String id = request.getParameter("id");
         switch (action) {
             case "delete":
                 storage.delete(Integer.parseInt(id));
