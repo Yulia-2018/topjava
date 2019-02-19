@@ -1,4 +1,3 @@
-<html>
 <head>
     <meta charset="UTF-8">
     <title>Java Enterprise (Topjava)</title>
@@ -8,6 +7,12 @@
 <hr>
 <ul>
     <li><a href="users">Users</a></li>
+    <form method="post" action="users">
+        <select name="id" size="2" onchange="this.form.submit()">
+            <option value="1">User1</option>
+            <option value="2">User2</option>
+        </select>
+    </form>
     <li><a href="meals">Meals</a></li>
 </ul>
 </body>

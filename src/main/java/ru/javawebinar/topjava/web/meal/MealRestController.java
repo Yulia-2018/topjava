@@ -7,13 +7,12 @@ import org.springframework.stereotype.Controller;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.service.MealService;
 import ru.javawebinar.topjava.to.MealTo;
-import ru.javawebinar.topjava.util.DateTimeUtil;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
+import static ru.javawebinar.topjava.util.MealsUtil.getFilteredWithExcess;
 import static ru.javawebinar.topjava.util.MealsUtil.getWithExcess;
 import static ru.javawebinar.topjava.util.ValidationUtil.assureIdConsistent;
 import static ru.javawebinar.topjava.util.ValidationUtil.checkNew;
@@ -38,12 +37,8 @@ public class MealRestController {
         LocalDate validEndDate = endDate.equals("") ? LocalDate.MAX : LocalDate.parse(endDate);
         LocalTime validStartTime = startTime.equals("") ? LocalTime.MIN : LocalTime.parse(startTime);
         LocalTime validEndTime = endTime.equals("") ? LocalTime.MAX : LocalTime.parse(endTime);
-        final List<MealTo> allMealsTo = getAll();
-        return allMealsTo
-                .stream()
-                .filter(meal -> DateTimeUtil.isBetween(meal.getDateTime().toLocalDate(), validStartDate, validEndDate) &
-                        DateTimeUtil.isBetween(meal.getDateTime().toLocalTime(), validStartTime, validEndTime))
-                .collect(Collectors.toList());
+        final List<Meal> allFilteredByDate = service.getAllFilteredByDate(authUserId(), validStartDate, validEndDate);
+        return getFilteredWithExcess(allFilteredByDate, authUserCaloriesPerDay(), validStartTime, validEndTime);
     }
 
     public Meal get(int id) {
