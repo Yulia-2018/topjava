@@ -41,7 +41,11 @@ public class InMemoryMealRepositoryImpl implements MealRepository {
         // treat case: update, but absent in storage
         final int id = meal.getId();
         final Meal mealInMemory = get(userId, id);
-        return (mealInMemory != null) ? repository.computeIfPresent(id, (idMeal, oldMeal) -> meal) : null;
+        if (mealInMemory != null) {
+            repository.put(id, meal);
+            return meal;
+        }
+        return null;
     }
 
     @Override
@@ -71,13 +75,12 @@ public class InMemoryMealRepositoryImpl implements MealRepository {
     }
 
     private List<Meal> getAllFiltered(int userId, Predicate<Meal> filter) {
-        final List<Meal> filteredMeals = repository.values()
+        return repository.values()
                 .stream()
                 .filter(meal -> meal.getUserId() == userId)
                 .filter(filter)
+                .sorted(mealComparator)
                 .collect(Collectors.toList());
-        filteredMeals.sort(mealComparator);
-        return filteredMeals;
     }
 }
 
