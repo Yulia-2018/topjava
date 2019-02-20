@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 public class InMemoryMealRepositoryImpl implements MealRepository {
     private static final Logger log = LoggerFactory.getLogger(InMemoryMealRepositoryImpl.class);
     private static final Comparator<Meal> mealComparator = Comparator.comparing(Meal::getDateTime).reversed();
-    private Map<Integer, Meal> repository = new ConcurrentHashMap<>();
+    private Map<Integer, Map<Integer, Meal>> repository = new ConcurrentHashMap<>();
     private AtomicInteger counter = new AtomicInteger(0);
 
     {
@@ -32,17 +32,17 @@ public class InMemoryMealRepositoryImpl implements MealRepository {
     @Override
     public Meal save(int userId, Meal meal) {
         log.info("save {}", meal);
-        meal.setUserId(userId);
+        repository.putIfAbsent(userId, new ConcurrentHashMap<>());
         if (meal.isNew()) {
             meal.setId(counter.incrementAndGet());
-            repository.put(meal.getId(), meal);
+            repository.get(userId).put(meal.getId(), meal);
             return meal;
         }
         // treat case: update, but absent in storage
         final int id = meal.getId();
         final Meal mealInMemory = get(userId, id);
         if (mealInMemory != null) {
-            repository.put(id, meal);
+            repository.get(userId).put(id, meal);
             return meal;
         }
         return null;
@@ -51,15 +51,13 @@ public class InMemoryMealRepositoryImpl implements MealRepository {
     @Override
     public boolean delete(int userId, int id) {
         log.info("delete {}", id);
-        final Meal meal = get(userId, id);
-        return meal != null && repository.remove(id) != null;
+        return repository.get(userId).remove(id) != null;
     }
 
     @Override
     public Meal get(int userId, int id) {
         log.info("get {}", id);
-        final Meal meal = repository.get(id);
-        return (meal != null && meal.getUserId() == userId) ? meal : null;
+        return repository.get(userId).get(id);
     }
 
     @Override
@@ -75,12 +73,10 @@ public class InMemoryMealRepositoryImpl implements MealRepository {
     }
 
     private List<Meal> getAllFiltered(int userId, Predicate<Meal> filter) {
-        return repository.values()
+        return repository.get(userId).values()
                 .stream()
-                .filter(meal -> meal.getUserId() == userId)
                 .filter(filter)
                 .sorted(mealComparator)
                 .collect(Collectors.toList());
     }
 }
-
