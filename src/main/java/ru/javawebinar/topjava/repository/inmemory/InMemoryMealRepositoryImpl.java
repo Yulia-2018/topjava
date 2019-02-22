@@ -9,6 +9,7 @@ import ru.javawebinar.topjava.util.DateTimeUtil;
 import ru.javawebinar.topjava.util.MealsUtil;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -32,32 +33,30 @@ public class InMemoryMealRepositoryImpl implements MealRepository {
     @Override
     public Meal save(int userId, Meal meal) {
         log.info("save {}", meal);
-        repository.putIfAbsent(userId, new ConcurrentHashMap<>());
+        Integer id = meal.getId();
         if (meal.isNew()) {
-            meal.setId(counter.incrementAndGet());
-            repository.get(userId).put(meal.getId(), meal);
-            return meal;
+            id = counter.incrementAndGet();
+            meal.setId(id);
+        } else if (get(userId, id) == null) {
+            return null;
         }
-        // treat case: update, but absent in storage
-        final int id = meal.getId();
-        final Meal mealInMemory = get(userId, id);
-        if (mealInMemory != null) {
-            repository.get(userId).put(id, meal);
-            return meal;
-        }
-        return null;
+        repository.putIfAbsent(userId, new ConcurrentHashMap<>());
+        repository.get(userId).put(id, meal);
+        return meal;
     }
 
     @Override
     public boolean delete(int userId, int id) {
         log.info("delete {}", id);
-        return repository.get(userId).remove(id) != null;
+        final Map<Integer, Meal> userMeals = repository.get(userId);
+        return userMeals != null && userMeals.remove(id) != null;
     }
 
     @Override
     public Meal get(int userId, int id) {
         log.info("get {}", id);
-        return repository.get(userId).get(id);
+        final Map<Integer, Meal> userMeals = repository.get(userId);
+        return userMeals == null ? null : userMeals.get(id);
     }
 
     @Override
@@ -73,7 +72,8 @@ public class InMemoryMealRepositoryImpl implements MealRepository {
     }
 
     private List<Meal> getAllFiltered(int userId, Predicate<Meal> filter) {
-        return repository.get(userId).values()
+        final Map<Integer, Meal> userMeals = repository.get(userId);
+        return userMeals == null ? Collections.emptyList() : userMeals.values()
                 .stream()
                 .filter(filter)
                 .sorted(mealComparator)
