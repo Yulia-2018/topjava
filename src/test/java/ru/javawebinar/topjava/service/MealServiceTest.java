@@ -11,6 +11,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.Collections;
@@ -52,7 +53,7 @@ public class MealServiceTest {
     public void delete() {
         service.delete(MEAL_USER_2_ID, USER_ID);
         final List<Meal> meals = service.getAll(USER_ID);
-        assertMatch(meals, MEAL_USER_3, MEAL_USER_1);
+        assertMatch(meals, MEAL_USER_6, MEAL_USER_5, MEAL_USER_4, MEAL_USER_3, MEAL_USER_1);
     }
 
     @Test(expected = NotFoundException.class)
@@ -61,17 +62,24 @@ public class MealServiceTest {
     }
 
     @Test
-    public void getBetweenDates() {
-        final List<Meal> meals = service.getBetweenDateTimes(LocalDateTime.of(2018, Month.MAY, 5, 12, 5),
-                LocalDateTime.now(), USER_ID);
+    public void getBetweenDates1() {
+        final List<Meal> meals = service.getBetweenDates(LocalDate.of(2018, Month.MAY, 5),
+                LocalDate.now(), USER_ID);
         assertMatch(meals, Collections.emptyList());
+    }
+
+    @Test
+    public void getBetweenDates2() {
+        final List<Meal> meals = service.getBetweenDates(LocalDate.of(2015, Month.MAY, 31),
+                LocalDate.of(2018, Month.APRIL, 15), USER_ID);
+        assertMatch(meals, MEAL_USER_6, MEAL_USER_5, MEAL_USER_4);
     }
 
     @Test
     public void getBetweenDateTimes() {
         final List<Meal> meals = service.getBetweenDateTimes(LocalDateTime.of(2015, Month.MAY, 30, 12, 5),
-                LocalDateTime.of(2015, Month.MAY, 30, 21, 20), USER_ID);
-        assertMatch(meals, MEAL_USER_3, MEAL_USER_2);
+                LocalDateTime.of(2018, Month.APRIL, 15, 21, 20), USER_ID);
+        assertMatch(meals, MEAL_USER_6, MEAL_USER_5, MEAL_USER_3, MEAL_USER_2);
     }
 
     @Test
@@ -97,7 +105,6 @@ public class MealServiceTest {
     public void create() {
         Meal newMeal = new Meal(LocalDateTime.of(2015, Month.JUNE, 1, 16, 15), "Админ полдник", 380);
         service.create(newMeal, ADMIN_ID);
-        newMeal.setId(newMeal.getId());
         assertMatch(service.getAll(ADMIN_ID), MEAL_ADMIN_2, newMeal, MEAL_ADMIN_1);
     }
 }
