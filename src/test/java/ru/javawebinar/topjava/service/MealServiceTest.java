@@ -64,7 +64,7 @@ public class MealServiceTest {
     @Test
     public void getBetweenDates1() {
         final List<Meal> meals = service.getBetweenDates(LocalDate.of(2018, Month.MAY, 5),
-                LocalDate.now(), USER_ID);
+                LocalDate.of(2019, Month.MARCH, 1), USER_ID);
         assertMatch(meals, Collections.emptyList());
     }
 
@@ -78,8 +78,8 @@ public class MealServiceTest {
     @Test
     public void getBetweenDateTimes() {
         final List<Meal> meals = service.getBetweenDateTimes(LocalDateTime.of(2015, Month.MAY, 30, 12, 5),
-                LocalDateTime.of(2018, Month.APRIL, 15, 21, 20), USER_ID);
-        assertMatch(meals, MEAL_USER_6, MEAL_USER_5, MEAL_USER_3, MEAL_USER_2);
+                LocalDateTime.of(2015, Month.MAY, 31, 19, 58), USER_ID);
+        assertMatch(meals, MEAL_USER_5, MEAL_USER_4, MEAL_USER_3, MEAL_USER_2);
     }
 
     @Test
