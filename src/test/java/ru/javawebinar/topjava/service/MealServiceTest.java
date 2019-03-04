@@ -35,11 +35,14 @@ import static ru.javawebinar.topjava.UserTestData.USER_ID;
 public class MealServiceTest {
 
     private static final Logger log = LoggerFactory.getLogger(MealServiceTest.class);
+    private static StringBuilder summaryOnTime = new StringBuilder();
+
+    static {
+        SLF4JBridgeHandler.install();
+    }
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
-
-    private static StringBuilder summaryOnTime = new StringBuilder();
 
     @Rule
     public Stopwatch stopwatch = new Stopwatch() {
@@ -55,10 +58,6 @@ public class MealServiceTest {
             super.finished(nanos, description);
         }
     };
-
-    static {
-        SLF4JBridgeHandler.install();
-    }
 
     @AfterClass
     public static void endAllTest() {
