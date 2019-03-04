@@ -4,11 +4,11 @@ import org.junit.AfterClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.junit.rules.TestName;
-import org.junit.rules.TestRule;
-import org.junit.rules.TestWatcher;
+import org.junit.rules.Stopwatch;
 import org.junit.runner.Description;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -20,6 +20,7 @@ import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.concurrent.TimeUnit;
 
 import static ru.javawebinar.topjava.MealTestData.*;
 import static ru.javawebinar.topjava.UserTestData.ADMIN_ID;
@@ -33,29 +34,25 @@ import static ru.javawebinar.topjava.UserTestData.USER_ID;
 @Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
 public class MealServiceTest {
 
+    private static final Logger log = LoggerFactory.getLogger(MealServiceTest.class);
+
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
-    @Rule
-    public TestName name = new TestName();
-
-    private long startTime;
-    private static String watchedLog = "";
+    private static StringBuilder summaryOnTime = new StringBuilder();
 
     @Rule
-    public final TestRule watchman = new TestWatcher() {
+    public Stopwatch stopwatch = new Stopwatch() {
         @Override
-        protected void starting(Description description) {
-            super.starting(description);
-            startTime = System.currentTimeMillis();
-        }
-
-        @Override
-        protected void finished(Description description) {
-            final String message = name.getMethodName() + " - " + (System.currentTimeMillis() - startTime) + " ms" + "\n";
-            watchedLog = watchedLog + message;
-            System.out.println(message);
-            super.finished(description);
+        protected void finished(long nanos, Description description) {
+            final long durationInMs = TimeUnit.MILLISECONDS.convert(nanos, TimeUnit.NANOSECONDS);
+            log.info(durationInMs + " ms");
+            summaryOnTime.append("\n")
+                    .append(description.getMethodName())
+                    .append(" - ")
+                    .append(durationInMs)
+                    .append(" ms");
+            super.finished(nanos, description);
         }
     };
 
@@ -65,7 +62,7 @@ public class MealServiceTest {
 
     @AfterClass
     public static void endAllTest() {
-        System.out.println(watchedLog);
+        log.info(summaryOnTime.toString());
     }
 
     @Autowired
