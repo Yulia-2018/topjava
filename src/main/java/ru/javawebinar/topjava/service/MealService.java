@@ -2,6 +2,7 @@ package ru.javawebinar.topjava.service;
 
 import org.springframework.lang.Nullable;
 import ru.javawebinar.topjava.model.Meal;
+import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import java.time.LocalDate;
@@ -27,4 +28,8 @@ public interface MealService {
     void update(Meal meal, int userId) throws NotFoundException;
 
     Meal create(Meal meal, int userId);
+
+    default User getUserForMeal(int id) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 }
