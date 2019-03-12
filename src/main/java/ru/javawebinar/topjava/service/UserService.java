@@ -1,7 +1,6 @@
 package ru.javawebinar.topjava.service;
 
 
-import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
@@ -21,7 +20,5 @@ public interface UserService {
 
     List<User> getAll();
 
-    default List<Meal> getAllMeals(int id) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
+    User getWithMeals(int id);
 }
