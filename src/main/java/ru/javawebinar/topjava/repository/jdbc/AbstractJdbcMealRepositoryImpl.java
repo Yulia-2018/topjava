@@ -23,6 +23,15 @@ public abstract class AbstractJdbcMealRepositoryImpl implements MealRepository {
     @Autowired
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
+    private SimpleJdbcInsert insertMeal;
+
+    @Autowired
+    private void setInsertMeal(JdbcTemplate jdbcTemplate) {
+        this.insertMeal = new SimpleJdbcInsert(jdbcTemplate)
+                .withTableName("meals")
+                .usingGeneratedKeyColumns("id");
+    }
+
     @Override
     public Meal save(Meal meal, int userId) {
         MapSqlParameterSource map = new MapSqlParameterSource()
@@ -31,10 +40,6 @@ public abstract class AbstractJdbcMealRepositoryImpl implements MealRepository {
                 .addValue("calories", meal.getCalories())
                 .addValue("date_time", getValidDate(meal.getDateTime()))
                 .addValue("user_id", userId);
-
-        SimpleJdbcInsert insertMeal = new SimpleJdbcInsert(jdbcTemplate)
-                .withTableName("meals")
-                .usingGeneratedKeyColumns("id");
 
         if (meal.isNew()) {
             Number newId = insertMeal.executeAndReturnKey(map);
