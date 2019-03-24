@@ -60,19 +60,18 @@ public class JdbcUserRepositoryImpl implements UserRepository {
     }
 
     @Override
+    @Transactional
     public boolean delete(int id) {
         return jdbcTemplate.update("DELETE FROM users WHERE id=?", id) != 0;
     }
 
     @Override
-    @Transactional
     public User get(int id) {
         List<User> users = jdbcTemplate.query("SELECT * FROM users WHERE id=?", ROW_MAPPER, id);
         return getUserWithRoles(users);
     }
 
     @Override
-    @Transactional
     public User getByEmail(String email) {
 //        return jdbcTemplate.queryForObject("SELECT * FROM users WHERE email=?", ROW_MAPPER, email);
         List<User> users = jdbcTemplate.query("SELECT * FROM users WHERE email=?", ROW_MAPPER, email);
@@ -80,19 +79,17 @@ public class JdbcUserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    @Transactional
     public List<User> getAll() {
         List<User> users = jdbcTemplate.query("SELECT * FROM users ORDER BY name, email", ROW_MAPPER);
-        List<Map<String, Object>> mapsUserRoles = jdbcTemplate.queryForList("SELECT * FROM user_roles");
+        List<User> usersRoles = jdbcTemplate.query("SELECT user_id AS id, role AS roles FROM user_roles", ROW_MAPPER);
         Map<Integer, Set<Role>> rolesMap = new HashMap<>();
-        for (Map<String, Object> map : mapsUserRoles) {
-            int userId = (int) map.get("user_id");
-            Role role = Role.valueOf(map.get("role").toString());
-            rolesMap.computeIfAbsent(userId, key -> EnumSet.of(role));
-            Set<Role> roles = rolesMap.get(userId);
-            roles.add(role);
+        usersRoles.forEach(user -> {
+            int userId = user.getId();
+            Set<Role> roleSet = user.getRoles();
+            Set<Role> roles = rolesMap.computeIfAbsent(userId, key -> roleSet);
+            roles.add(DataAccessUtils.singleResult(roleSet));
             rolesMap.put(userId, roles);
-        }
+        });
         users.forEach(user -> user.setRoles(rolesMap.get(user.getId())));
         return users;
     }
@@ -101,11 +98,11 @@ public class JdbcUserRepositoryImpl implements UserRepository {
         User user = DataAccessUtils.singleResult(users);
         if (user != null) {
             Set<Role> roles = new HashSet<>();
-            List<Map<String, Object>> mapsUserRoles = jdbcTemplate.queryForList("SELECT role FROM user_roles WHERE user_id=?", user.getId());
-            for (Map<String, Object> map : mapsUserRoles) {
-                Role role = Role.valueOf(map.get("role").toString());
+            List<User> userRoles = jdbcTemplate.query("SELECT role AS roles FROM user_roles WHERE user_id=?", ROW_MAPPER, user.getId());
+            userRoles.forEach(userRole -> {
+                Role role = DataAccessUtils.singleResult(userRole.getRoles());
                 roles.add(role);
-            }
+            });
             user.setRoles(roles);
             return user;
         }
