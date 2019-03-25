@@ -82,11 +82,11 @@ public class JdbcUserRepositoryImpl implements UserRepository {
     public List<User> getAll() {
         List<User> users = jdbcTemplate.query("SELECT * FROM users ORDER BY name, email", ROW_MAPPER);
         List<User> usersRoles = jdbcTemplate.query("SELECT user_id AS id, role AS roles FROM user_roles", ROW_MAPPER);
-        Map<Integer, Set<Role>> rolesMap = new HashMap<>();
+        Map<Integer, EnumSet<Role>> rolesMap = new HashMap<>();
         usersRoles.forEach(user -> {
             int userId = user.getId();
-            Set<Role> roleSet = user.getRoles();
-            Set<Role> roles = rolesMap.computeIfAbsent(userId, key -> roleSet);
+            EnumSet<Role> roleSet = EnumSet.copyOf(user.getRoles());
+            EnumSet<Role> roles = rolesMap.computeIfAbsent(userId, key -> roleSet);
             roles.add(DataAccessUtils.singleResult(roleSet));
             rolesMap.put(userId, roles);
         });
@@ -97,12 +97,13 @@ public class JdbcUserRepositoryImpl implements UserRepository {
     private User getUserWithRoles(List<User> users) {
         User user = DataAccessUtils.singleResult(users);
         if (user != null) {
-            Set<Role> roles = new HashSet<>();
-            List<User> userRoles = jdbcTemplate.query("SELECT role AS roles FROM user_roles WHERE user_id=?", ROW_MAPPER, user.getId());
-            userRoles.forEach(userRole -> {
-                Role role = DataAccessUtils.singleResult(userRole.getRoles());
-                roles.add(role);
-            });
+            EnumSet<Role> roles = jdbcTemplate.query("SELECT role FROM user_roles WHERE user_id=?", (rs) -> {
+                List<Role> list = new ArrayList<>();
+                while (rs.next()) {
+                    list.add(Role.valueOf(rs.getString("role")));
+                }
+                return EnumSet.copyOf(list);
+            }, user.getId());
             user.setRoles(roles);
             return user;
         }

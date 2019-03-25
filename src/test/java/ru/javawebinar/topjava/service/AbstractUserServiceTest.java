@@ -73,6 +73,12 @@ public abstract class AbstractUserServiceTest extends AbstractServiceTest {
     }
 
     @Test
+    public void getByEmailWithMultipleRoles() throws Exception {
+        User user = service.getByEmail("admin@gmail.com");
+        assertMatch(user, ADMIN);
+    }
+
+    @Test
     public void update() throws Exception {
         User updated = new User(USER);
         updated.setName("UpdatedName");
@@ -90,7 +96,7 @@ public abstract class AbstractUserServiceTest extends AbstractServiceTest {
 
     @Test
     public void testValidation() throws Exception {
-        checkProfile();
+        checkJdbcProfile();
         validateRootCause(() -> service.create(new User(null, "  ", "mail@yandex.ru", "password", ROLE_USER)), ConstraintViolationException.class);
         validateRootCause(() -> service.create(new User(null, "User", "  ", "password", ROLE_USER)), ConstraintViolationException.class);
         validateRootCause(() -> service.create(new User(null, "User", "mail@yandex.ru", "  ", ROLE_USER)), ConstraintViolationException.class);

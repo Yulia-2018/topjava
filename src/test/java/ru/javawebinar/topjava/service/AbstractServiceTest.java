@@ -60,7 +60,7 @@ abstract public class AbstractServiceTest {
         }
     }
 
-    protected void checkProfile() throws Exception {
+    protected void checkJdbcProfile() throws Exception {
         Assume.assumeTrue(!List.of(environment.getActiveProfiles()).contains(JDBC));
     }
 }
