@@ -1,29 +1,36 @@
 package ru.javawebinar.topjava.web.meal;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
 import ru.javawebinar.topjava.model.Meal;
+import ru.javawebinar.topjava.service.MealService;
 import ru.javawebinar.topjava.to.MealTo;
 import ru.javawebinar.topjava.util.MealsUtil;
 import ru.javawebinar.topjava.web.AbstractControllerTest;
 import ru.javawebinar.topjava.web.json.JsonUtil;
 
-import java.time.LocalDateTime;
-import java.time.Month;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static ru.javawebinar.topjava.MealTestData.*;
-import static ru.javawebinar.topjava.TestUtil.readFromJson;
+import static ru.javawebinar.topjava.TestUtil.*;
 import static ru.javawebinar.topjava.UserTestData.USER_ID;
-import static ru.javawebinar.topjava.web.SecurityUtil.authUserCaloriesPerDay;
+import static ru.javawebinar.topjava.util.MealsUtil.DEFAULT_CALORIES_PER_DAY;
+import static ru.javawebinar.topjava.util.MealsUtil.createWithExcess;
 
 
 class MealRestControllerTest extends AbstractControllerTest {
+
+    @Autowired
+    private MealService mealService;
 
     private static final String REST_URL = MealRestController.REST_URL + '/';
 
@@ -34,6 +41,16 @@ class MealRestControllerTest extends AbstractControllerTest {
                 .andDo(print())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(contentJson(MEAL1));
+    }
+
+    @Test
+    void testGetAll() throws Exception {
+        List<MealTo> mealsWithExcess = MealsUtil.getWithExcess(MEALS, DEFAULT_CALORIES_PER_DAY);
+        mockMvc.perform(get(REST_URL))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(contentJson(mealsWithExcess));
     }
 
     @Test
@@ -71,13 +88,19 @@ class MealRestControllerTest extends AbstractControllerTest {
 
     @Test
     void testGetBetween() throws Exception {
-        List<MealTo> mealsWithExcess = MealsUtil.getWithExcess(MEALS, authUserCaloriesPerDay());
-        LocalDateTime startDateTime =  LocalDateTime.of(2015, Month.MAY, 29,12, 0);
-        LocalDateTime endDateTime =  LocalDateTime.of(2015, Month.MAY, 30, 22, 0);
-        mockMvc.perform(get(REST_URL + "filter?startDateTime=" + startDateTime + "&endDateTime=" + endDateTime))
+        Map<LocalDate, Integer> caloriesSumByDate = MEALS.stream()
+                .collect(
+                        Collectors.groupingBy(Meal::getDate, Collectors.summingInt(Meal::getCalories))
+                );
+        mockMvc.perform(get(REST_URL + "filter?startDateTime=2015-05-29T12:00&endDateTime=2015-05-30T22:00"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(contentJson(mealsWithExcess.get(3), mealsWithExcess.get(4)/*MEAL3, MEAL2*/));
+                .andExpect(contentJson(
+                        createWithExcess(MEAL3, caloriesSumByDate.get(MEAL3.getDate()) > DEFAULT_CALORIES_PER_DAY),
+                        createWithExcess(MEAL2, caloriesSumByDate.get(MEAL2.getDate()) > DEFAULT_CALORIES_PER_DAY)
+                        )
+                );
+        //.andExpect(contentJson(createWithExcess(MEAL3, false), createWithExcess(MEAL2, false)));
     }
 }

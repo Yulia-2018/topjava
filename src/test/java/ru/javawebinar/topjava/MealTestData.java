@@ -8,9 +8,8 @@ import java.time.Month;
 import java.util.List;
 
 import static java.time.LocalDateTime.of;
-import static org.assertj.core.api.Assertions.assertThat;
-import static ru.javawebinar.topjava.TestUtil.readFromJsonMvcResult;
-import static ru.javawebinar.topjava.TestUtil.readListFromJsonMvcResult;
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+import static ru.javawebinar.topjava.TestUtil.*;
 import static ru.javawebinar.topjava.model.AbstractBaseEntity.START_SEQ;
 
 public class MealTestData {
@@ -57,11 +56,11 @@ public class MealTestData {
     }
 
     public static void assertMatchForMealTO(Iterable<MealTo> actual, Iterable<MealTo> expected) {
-        assertThat(actual).usingElementComparatorIgnoringFields("user").isEqualTo(expected);
+        assertThat(actual).usingFieldByFieldElementComparator().isEqualTo(expected);
     }
 
     public static void assertMatchForMealTO(MealTo actual, MealTo expected) {
-        assertThat(actual).isEqualToIgnoringGivenFields(expected, "user");
+        assertThat(actual).isEqualToComparingFieldByField(expected);
     }
 
     public static ResultMatcher contentJson(MealTo... expected) {
@@ -70,5 +69,9 @@ public class MealTestData {
 
     public static ResultMatcher contentJson(MealTo expected) {
         return result -> assertMatchForMealTO(readFromJsonMvcResult(result, MealTo.class), expected);
+    }
+
+    public static ResultMatcher contentJson(List<MealTo> expected) {
+        return result -> assertMatchForMealTO(readListFromJsonMvcResult(result, MealTo.class), expected);
     }
 }
