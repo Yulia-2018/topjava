@@ -92,7 +92,8 @@ class MealRestControllerTest extends AbstractControllerTest {
                 .collect(
                         Collectors.groupingBy(Meal::getDate, Collectors.summingInt(Meal::getCalories))
                 );
-        mockMvc.perform(get(REST_URL + "filter?startDateTime=2015-05-29T12:00&endDateTime=2015-05-30T22:00"))
+        //mockMvc.perform(get(REST_URL + "filter?startDateTime=2015-05-29T12:00&endDateTime=2015-05-30T22:00"))
+        mockMvc.perform(get(REST_URL + "filter?startDate=2015-05-29&startTime=12:00&endDate=2015-05-30&endTime=22:00"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
