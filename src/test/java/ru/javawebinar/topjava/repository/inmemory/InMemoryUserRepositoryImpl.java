@@ -30,6 +30,11 @@ public class InMemoryUserRepositoryImpl extends InMemoryBaseRepositoryImpl<User>
     }
 
     @Override
+    public void enable(boolean enabled, int id) {
+        entryMap.get(id).setEnabled(enabled);
+    }
+
+    @Override
     public User getByEmail(String email) {
         Objects.requireNonNull(email, "email must not be null");
         return getCollection().stream()

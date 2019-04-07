@@ -93,6 +93,12 @@ public class JdbcUserRepositoryImpl implements UserRepository {
         return users;
     }
 
+    @Override
+    @Transactional
+    public void enable(boolean enabled, int id) {
+        jdbcTemplate.update("UPDATE users u SET enabled=? WHERE id=?", enabled, id);
+    }
+
     private void insertRoles(User u) {
         Set<Role> roles = u.getRoles();
         if (!CollectionUtils.isEmpty(roles)) {
