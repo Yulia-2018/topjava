@@ -34,7 +34,7 @@ public interface CrudUserRepository extends JpaRepository<User, Integer> {
     @Transactional
     @Modifying
     @Query("UPDATE User u SET u.enabled=?1 WHERE u.id=?2")
-    void enable(boolean enabled, int id);
+    int enable(boolean enabled, int id);
 
     //    https://stackoverflow.com/a/46013654/548473
     @EntityGraph(attributePaths = {"meals"}, type = EntityGraph.EntityGraphType.LOAD)

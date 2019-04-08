@@ -96,4 +96,10 @@ public abstract class AbstractUserServiceTest extends AbstractServiceTest {
         service.enable(false, USER_ID);
         assertThat(service.get(USER_ID).isEnabled()).isEqualTo(false);
     }
+
+    @Test
+    void enableNotFound() throws Exception {
+        assertThrows(NotFoundException.class, () ->
+                service.enable(false, 1));
+    }
 }

@@ -29,9 +29,13 @@ function deleteRow(id) {
     }
 }
 
+function drawTable(data) {
+    context.datatableApi.clear().rows.add(data).draw();
+}
+
 function updateTableCommon() {
     $.get(context.ajaxUrl, function (data) {
-        context.datatableApi.clear().rows.add(data).draw();
+        drawTable(data);
     });
 }
 

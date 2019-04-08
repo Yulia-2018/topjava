@@ -22,5 +22,5 @@ public interface UserService {
 
     User getWithMeals(int id);
 
-    void enable(boolean enabled, int id);
+    void enable(boolean enabled, int id) throws NotFoundException;
 }

@@ -35,6 +35,8 @@ $(function () {
     );
 });
 
+let ajaxUrlMeal = "ajax/profile/meals/";
+
 function updateTable() {
     updateFilteredTable();
 }
@@ -49,9 +51,9 @@ function clearFilter() {
 function updateFilteredTable() {
     $.ajax({
         type: "GET",
-        url: context.ajaxUrl + 'filter',
+        url: ajaxUrlMeal + 'filter',
         data: filterForm.serialize()
     }).done(function (data) {
-        context.datatableApi.clear().rows.add(data).draw();
+        drawTable(data);
     });
 }

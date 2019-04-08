@@ -68,7 +68,7 @@ public class UserServiceImpl implements UserService {
 
     @CacheEvict(value = "users", allEntries = true)
     @Override
-    public void enable(boolean enabled, int id) {
-        repository.enable(enabled, id);
+    public void enable(boolean enabled, int id) throws NotFoundException {
+        checkNotFoundWithId(repository.enable(enabled, id), id);
     }
 }

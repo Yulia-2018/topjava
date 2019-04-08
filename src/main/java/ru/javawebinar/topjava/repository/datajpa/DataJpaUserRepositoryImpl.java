@@ -41,8 +41,8 @@ public class DataJpaUserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public void enable(boolean enabled, int id) {
-        crudRepository.enable(enabled, id);
+    public boolean enable(boolean enabled, int id) {
+        return crudRepository.enable(enabled, id) != 0;
     }
 
     @Override

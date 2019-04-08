@@ -30,8 +30,13 @@ public class InMemoryUserRepositoryImpl extends InMemoryBaseRepositoryImpl<User>
     }
 
     @Override
-    public void enable(boolean enabled, int id) {
-        entryMap.get(id).setEnabled(enabled);
+    public boolean enable(boolean enabled, int id) {
+        User user = entryMap.get(id);
+        if (user == null) {
+            return false;
+        }
+        user.setEnabled(enabled);
+        return true;
     }
 
     @Override

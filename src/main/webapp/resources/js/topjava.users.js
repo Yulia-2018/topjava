@@ -41,16 +41,29 @@ $(function () {
     );
 });
 
+let ajaxUrlUser = "ajax/admin/users/";
+
 function updateTable() {
     updateTableCommon();
 }
 
-function enable(isEnabled,id) {
-    $.ajax({
+function enable(checkbox, id) {
+    let isEnabled = checkbox.prop('checked');
+    let request = $.ajax({
         type: "POST",
-        url: context.ajaxUrl + id,
+        url: ajaxUrlUser + id,
         data: {enabled: isEnabled}
-    }).done(function () {
-        updateTableCommon();
+    });
+    request.done(function () {
+        if (isEnabled === true) {
+            $('tr#'+id).animate({opacity: '1.0'});
+            successNoty("Recording activated");
+        } else {
+            $('tr#'+id).animate({opacity: '0.3'});
+            successNoty("Recording deactivated");
+        }
+    });
+    request.fail(function () {
+        checkbox.checked = !isEnabled;
     });
 }
