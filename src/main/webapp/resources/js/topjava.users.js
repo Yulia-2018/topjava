@@ -55,13 +55,8 @@ function enable(checkbox, id) {
         data: {enabled: isEnabled}
     });
     request.done(function () {
-        if (isEnabled === true) {
-            $('tr#'+id).animate({opacity: '1.0'});
-            successNoty("Recording activated");
-        } else {
-            $('tr#'+id).animate({opacity: '0.3'});
-            successNoty("Recording deactivated");
-        }
+        checkbox.parents('tr').animate({opacity: (isEnabled === true) ? '1.0' : '0.3'});
+        successNoty((isEnabled === true) ? "Recording activated" : "Recording deactivated");
     });
     request.fail(function () {
         checkbox.checked = !isEnabled;
