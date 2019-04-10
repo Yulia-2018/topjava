@@ -55,8 +55,8 @@ function enable(checkbox, id) {
         data: {enabled: isEnabled}
     });
     request.done(function () {
-        checkbox.parents('tr').animate({opacity: (isEnabled === true) ? '1.0' : '0.3'});
-        successNoty((isEnabled === true) ? "Recording activated" : "Recording deactivated");
+        checkbox.parents('tr').attr('data-userEnabled', isEnabled);
+        successNoty(isEnabled ? "Recording activated" : "Recording deactivated");
     });
     request.fail(function () {
         checkbox.checked = !isEnabled;
