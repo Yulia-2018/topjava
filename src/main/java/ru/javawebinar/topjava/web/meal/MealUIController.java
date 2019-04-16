@@ -40,8 +40,7 @@ public class MealUIController extends AbstractMealController {
 
     @PostMapping
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    public ResponseEntity<String> createOrUpdate(@Valid MealTo mealTo, BindingResult result) {
-        Meal meal = new Meal(mealTo.getId(), mealTo.getDateTime(), mealTo.getDescription(), mealTo.getCalories());
+    public ResponseEntity<String> createOrUpdate(@Valid Meal meal, BindingResult result) {
         return getResponseEntity(result, () -> {
             if (meal.isNew()) {
                 super.create(meal);
