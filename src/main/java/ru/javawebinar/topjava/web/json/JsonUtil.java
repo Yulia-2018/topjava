@@ -44,4 +44,14 @@ public class JsonUtil {
         }
         return writeValue(map);
     }
+
+    public static <T> String writeAdditionProps(T obj, String addName, Object addValue) {
+        return writeAdditionProps(obj, Map.of(addName, addValue));
+    }
+
+    public static <T> String writeAdditionProps(T obj, Map<String, Object> addProps) {
+        Map<String, Object> map = getMapper().convertValue(obj, new TypeReference<Map<String, Object>>() {});
+        map.putAll(addProps);
+        return writeValue(map);
+    }
 }
