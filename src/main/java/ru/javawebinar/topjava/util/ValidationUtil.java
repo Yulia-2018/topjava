@@ -1,6 +1,5 @@
 package ru.javawebinar.topjava.util;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import ru.javawebinar.topjava.HasId;
 import ru.javawebinar.topjava.util.exception.IllegalRequestDataException;
@@ -58,7 +57,7 @@ public class ValidationUtil {
         return result;
     }
 
-    public static ResponseEntity<String> getErrorResponse(BindingResult result) {
+    public static void throwException(BindingResult result) {
         StringJoiner joiner = new StringJoiner("<br>");
         result.getFieldErrors().forEach(
                 fe -> {
@@ -70,7 +69,7 @@ public class ValidationUtil {
                         joiner.add(msg);
                     }
                 });
-        return ResponseEntity.unprocessableEntity().body(joiner.toString());
+        throw new IllegalArgumentException(joiner.toString());
     }
 
     public static String getMessage(Throwable e) {

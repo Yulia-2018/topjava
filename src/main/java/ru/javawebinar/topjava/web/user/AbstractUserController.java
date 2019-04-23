@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.service.UserService;
 import ru.javawebinar.topjava.to.UserTo;
+import ru.javawebinar.topjava.validator.UserFormValidator;
 
 import java.util.List;
 
@@ -17,6 +18,9 @@ public abstract class AbstractUserController {
 
     @Autowired
     private UserService service;
+
+    @Autowired(required=false)
+    UserFormValidator userFormValidator;
 
     public List<User> getAll() {
         log.info("getAll");
