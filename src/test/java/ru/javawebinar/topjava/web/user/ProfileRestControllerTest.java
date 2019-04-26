@@ -64,12 +64,12 @@ class ProfileRestControllerTest extends AbstractControllerTest {
 
     @Test
     void testRegisterInvalid() throws Exception {
-        UserTo createdTo = new UserTo(null, "   ", "newemail@ya.ru", "newPassword", 1500);
+        UserTo createdTo = new UserTo(null, "   ", "newemail@ya.ru", "newPassword", 8);
 
         mockMvc.perform(post(REST_URL + "/register").contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.writeValue(createdTo)))
                 .andDo(print())
-                .andExpect(status().isInternalServerError());
+                .andExpect(status().isUnprocessableEntity());
     }
 
     @Test
@@ -98,13 +98,13 @@ class ProfileRestControllerTest extends AbstractControllerTest {
 
     @Test
     void testUpdateInvalid() throws Exception {
-        UserTo updatedTo = new UserTo(null, "newName", "newemail@ya.ru", "123", 1500);
+        UserTo updatedTo = new UserTo(null, "newName", null, "123", -5);
 
         mockMvc.perform(put(REST_URL).contentType(MediaType.APPLICATION_JSON)
                 .with(userHttpBasic(USER))
                 .content(JsonUtil.writeValue(updatedTo)))
                 .andDo(print())
-                .andExpect(status().isInternalServerError());
+                .andExpect(status().isUnprocessableEntity());
     }
 
     @Test

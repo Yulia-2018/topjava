@@ -97,14 +97,13 @@ class AdminRestControllerTest extends AbstractControllerTest {
 
     @Test
     void testUpdateInvalid() throws Exception {
-        User updated = new User(USER);
-        updated.setEmail("UpdatedEmail");
+        User updated = new User(USER_ID, "New", "UpdatedEmail", "123", 2300, Role.ROLE_USER, Role.ROLE_ADMIN);
         mockMvc.perform(put(REST_URL + USER_ID)
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(userHttpBasic(ADMIN))
-                .content(jsonWithPassword(updated, "password")))
+                .content(jsonWithPassword(updated, "123")))
                 .andDo(print())
-                .andExpect(status().isInternalServerError());
+                .andExpect(status().isUnprocessableEntity());
     }
 
     @Test
@@ -138,13 +137,13 @@ class AdminRestControllerTest extends AbstractControllerTest {
 
     @Test
     void testCreateInvalid() throws Exception {
-        User expected = new User(null, "New", "new@gmail.com", "newPass", 5, Role.ROLE_USER, Role.ROLE_ADMIN);
+        User expected = new User(null, "New", "   ", "newPass", 5, Role.ROLE_USER, Role.ROLE_ADMIN);
         mockMvc.perform(post(REST_URL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(userHttpBasic(ADMIN))
                 .content(jsonWithPassword(expected, "newPass")))
                 .andDo(print())
-                .andExpect(status().isInternalServerError());
+                .andExpect(status().isUnprocessableEntity());
     }
 
     @Test
